@@ -1,6 +1,6 @@
 # GarminSync
 
-## HowTO
+## HowTo
 0. 一台可以正确连接到[https://connect.garmin.com](https://connect.garmin.com)的电脑
 1. 克隆代码
 	`git clone https://github.com/plucury/GarminSync.git`
