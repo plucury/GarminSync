@@ -1,4 +1,5 @@
 # GarminSync
+同步佳明Connect中国站的活动数据到国际站
 
 ## HowTo
 0. 一台可以正确连接到[https://connect.garmin.com](https://connect.garmin.com)的电脑
