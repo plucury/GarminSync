@@ -8,8 +8,6 @@ import garth
 from dotenv import load_dotenv
 from garth.exc import GarthHTTPError
 
-load_dotenv()
-
 CN_DOMAIN = "garmin.cn"
 GLOBAL_DOMAIN = "garmin.com"
 
@@ -46,6 +44,8 @@ def upload_activity(client, fp: FileIO):
 @click.command()
 @click.option('--size', default=10, help='每次同步回溯的活动数量')
 def main(size):
+    load_dotenv()
+
     cn_username = os.getenv("CN_USERNAME")
     cn_password = os.getenv("CN_PASSWORD")
     global_username = os.getenv("GLOBAL_USERNAME")
@@ -62,22 +62,27 @@ def main(size):
     garth.configure(domain=GLOBAL_DOMAIN)
     garth.login(global_username, global_password)
     g_client = deepcopy(garth.client)
+    
+    sync(size, cn_client, g_client)
+    sync(size, g_client, cn_client)
+
+def sync(size, source, target):
     start = 0
     activities = []
     while size:
         limit = min(20, size)
-        activities.extend(get_activities(cn_client, start=start, limit=limit))
+        activities.extend(get_activities(source, start=start, limit=limit))
         size = size - limit
         start = start + limit
 
     for activity in activities:
         activity_id = activity["activityId"]
 
-        activity_bytes = download_activity(cn_client, activity_id)
+        activity_bytes = download_activity(source, activity_id)
         with zipfile.ZipFile(BytesIO(activity_bytes), mode="r") as zip_file:
             for file_name in zip_file.namelist():
                 with zip_file.open(file_name) as file:
-                    upload_activity(g_client, file)
+                    upload_activity(target, file)
 
 
 if __name__ == '__main__':
