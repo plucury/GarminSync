@@ -11,6 +11,8 @@ from garth.exc import GarthHTTPError
 CN_DOMAIN = "garmin.cn"
 GLOBAL_DOMAIN = "garmin.com"
 
+USER_AGENT = {"User-Agent": ("GCM-iOS-5.7.2.1")}
+
 
 def get_activities(client, start=0, limit=20):
     activities = client.request(
@@ -58,10 +60,12 @@ def main(size):
     garth.configure(domain=CN_DOMAIN)
     garth.login(cn_username, cn_password)
     cn_client = deepcopy(garth.client)
+    cn_client.sess.headers.update(USER_AGENT)
 
     garth.configure(domain=GLOBAL_DOMAIN)
     garth.login(global_username, global_password)
     g_client = deepcopy(garth.client)
+    g_client.sess.headers.update(USER_AGENT)
     
     sync(size, cn_client, g_client)
     sync(size, g_client, cn_client)
